@@ -1,0 +1,15 @@
+/* Основные стили для дашборда */
+.dashboard-container {
+    display: flex;
+    gap: 40px;
+    align-items: flex-start;
+}
+
+.calendar-block {
+    width: auto;
+    flex-shrink: 1;
+}
+
+.table-wrapper {
+    margin-top: 30px;
+}

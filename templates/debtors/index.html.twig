@@ -1,0 +1,138 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Список должников{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/home.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/table.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/pagination.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/search.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/legal-entity.css') }}">
+    
+    <style>
+        .filters-container {
+            margin-bottom: 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .text-center {
+            text-align: center;
+        }
+        
+        .status-active {
+            color: #21BA45;
+            font-weight: 600;
+        }
+        
+        .status-inactive {
+            color: #FF6B6B;
+            font-weight: 600;
+        }
+        
+        /* Стили для ссылок в таблице */
+        .debtor-link {
+            color: #333;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: color 0.2s;
+        }
+        
+        .debtor-link:hover {
+            color: #409EFF;
+        }
+        
+        .debtor-link:hover .link-icon {
+            opacity: 1;
+        }
+        
+        .link-icon {
+            opacity: 0.5;
+            font-size: 14px;
+            transition: opacity 0.2s;
+        }
+        
+        .external-link {
+            color: #333;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: color 0.2s;
+        }
+        
+        .external-link:hover {
+            color: #409EFF;
+            text-decoration: underline;
+        }
+        
+        .external-link:hover .external-icon {
+            opacity: 1;
+        }
+        
+        .external-icon {
+            opacity: 0.5;
+            font-size: 12px;
+            transition: opacity 0.2s;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="app-container">
+    {% include 'layout/header.html.twig' with {'page_title': 'Список должников'} %}
+    
+    <div class="grid-container">
+        {% include 'layout/sidebar.html.twig' with {'active_menu': 'debtors'} %}
+        
+        <main class="main-content">
+           
+            <!-- Блок фильтрации -->
+            <div class="filters-container">
+                <div class="search-block" style="margin-top: 0; flex: 1;">
+                    <input type="text" class="search-input" id="search-input" placeholder="поиск по фио, логину">
+                </div>
+                
+                <!-- Подключаем компонент выбора юрлица -->
+                {% include 'components/legal-entity-selector.html.twig' with {'wrapper_class': '', 'label_class': '', 'select_class': ''} %}
+            </div>
+            
+            <!-- Таблица -->
+            <div class="table-container">
+                <table class="data-table" id="data-table">
+                    <thead>
+                        <tr>
+                            <th>№</th>
+                            <th>Провайдер</th>
+                            <th>ФИО</th>
+                            <th>Логин</th>
+                            <th>Статус</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body">
+                        <!-- Данные будут загружаться через JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Блок пагинации -->
+            <div id="pagination-container"></div>
+        </main>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('js/pagination.js') }}"></script>
+    <script src="{{ asset('js/debtors-data.js') }}"></script>
+    <script src="{{ asset('js/debtors-filters.js') }}"></script>
+    <script src="{{ asset('js/debtors-table.js') }}"></script>
+    <script src="{{ asset('js/debtors-main.js') }}"></script>
+{% endblock %}

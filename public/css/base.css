@@ -1,0 +1,44 @@
+/* Сброс стилей */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    overflow: hidden;
+}
+
+.app-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100%;
+}
+
+/* Grid контейнер */
+.grid-container {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+/* Main Content */
+.main-content {
+    overflow-y: auto;
+    padding: 3.125rem;
+    flex: 1;
+    cursor: default;
+    transition: background-color 0.3s;
+}
+
+.content-header {
+    margin-bottom: 2rem;
+}
+
+.content-header h2 {
+    color: #333;
+    margin-bottom: 0.5rem;
+    transition: color 0.3s;
+}

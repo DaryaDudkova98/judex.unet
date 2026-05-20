@@ -1,0 +1,16 @@
+<!-- Sidebar -->
+<aside class="sidebar" id="sidebar">
+    <h1>Judex.unet.by</h1>
+    <nav class="sidebar-nav">
+        <ul>
+            <li><a href="{{ path('home') }}" class="{% if active_menu == 'home' %}active{% endif %}">Главная</a></li>
+            <li><a href="{{ path('debtors') }}" class="{% if active_menu == 'debtors' %}active{% endif %}">Список должников</a></li>
+            <li><a href="#" class="{% if active_menu == 'recovered' %}active{% endif %}">Список взысканных должников</a></li>
+            <li><a href="#" class="{% if active_menu == 'reports' %}active{% endif %}">Претензия</a></li>
+            <li><a href="#" class="{% if active_menu == 'reports' %}active{% endif %}">Госпошлина</a></li>
+            <li><a href="#" class="{% if active_menu == 'reports' %}active{% endif %}">Взысканые платежи</a></li>
+            <li><a href="#" class="{% if active_menu == 'reports' %}active{% endif %}">Отчетность</a></li>
+            <li><a href="#" class="{% if active_menu == 'reports' %}active{% endif %}">Загрузка файла</a></li>
+        </ul>
+    </nav>
+</aside>

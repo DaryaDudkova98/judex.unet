@@ -1,0 +1,117 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Домашняя страница
+{% endblock %}
+
+{% block stylesheets %}
+	{{ parent() }}
+	<link rel="stylesheet" href="{{ asset('css/home.css') }}">
+	<link rel="stylesheet" href="{{ asset('css/calendar.css') }}">
+	<link rel="stylesheet" href="{{ asset('css/table.css') }}">
+	<link rel="stylesheet" href="{{ asset('css/pagination.css') }}">
+	<link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
+	<link rel="stylesheet" href="{{ asset('css/stats.css') }}">
+	<link rel="stylesheet" href="{{ asset('css/legal-entity.css') }}">
+	<link rel="stylesheet" href="{{ asset('css/search.css') }}">
+
+	<!-- Подключаем Flatpickr и тему -->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_red.css">
+{% endblock %}
+
+{% block body %}
+	<div class="app-container">
+		{% include 'layout/header.html.twig' with {'page_title': 'Главная'} %}
+
+		<div class="grid-container">
+			{% include 'layout/sidebar.html.twig' with {'active_menu': 'home'} %}
+
+			<main class="main-content">
+
+				<div class="dashboard-container">
+					<div class="calendar-block">
+						<div class="calendar-wrapper">
+							<div id="calendar"></div>
+							<div class="result-panel">
+								<strong>📅 Выбранный период:</strong><br>
+								<span id="selected-date-range">—</span>
+								<button id="apply-range" class="btn-primary" style="display: none; margin-top: 10px;">Применить</button>
+							</div>
+						</div>
+					</div>
+
+					<div class="stats-block">
+						<div class="stats-container">
+							<ul class="stats-list">
+								<li class="stats-item">
+									<span class="stats-label">Общая сумма долга</span>
+									<span class="stats-value" id="total-debt">0</span>
+								</li>
+								<li class="stats-item">
+									<span class="stats-label">Всего должников</span>
+									<span class="stats-value" id="total-debtors">0</span>
+								</li>
+								<li class="stats-item">
+									<span class="stats-label">Новых должников</span>
+									<span class="stats-value" id="new-debtors">0</span>
+								</li>
+								<li class="stats-item">
+									<span class="stats-label">Закрыто должников</span>
+									<span class="stats-value" id="closed-debtors">0</span>
+								</li>
+							</ul>
+						</div>
+					</div>
+
+					<!-- Подключаем компонент выбора юрлица -->
+					{% include 'components/legal-entity-selector.html.twig' %}
+				</div>
+
+				<div class="search-block">
+					<input type="text" class="search-input" placeholder="поиск по фио, унп контрагента">
+					<button class="add-button" id="add-button">
+						<div class="button-icon">+</div>
+						<div class="button-text">Добавить</div>
+					</button>
+				</div>
+
+				<div class="table-wrapper">
+					<table class="data-table" id="data-table">
+						<thead>
+							<tr>
+								<th>№</th>
+								<th>Юрлицо</th>
+								<th>ФИО</th>
+								<th>Контрагент (ОПИ)</th>
+								<th>Решение суда</th>
+								<th>Госпошлина</th>
+							</tr>
+						</thead>
+						<tbody id="table-body">
+							<!-- Данные будут загружаться через JavaScript -->
+						</tbody>
+					</table>
+				</div>
+
+				<!-- Блок пагинации -->
+				<div id="pagination-container"></div>
+
+			</main>
+		</div>
+	</div>
+{% endblock %}
+
+{% block javascripts %}
+	{{ parent() }}
+	<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+	<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ru.js"></script>
+	<script src="{{ asset('js/calendar.js') }}"></script>
+	
+	<!-- Подключаем модули JavaScript -->
+	<script src="{{ asset('js/table-data.js') }}"></script>
+	<script src="{{ asset('js/table-render.js') }}"></script>
+	<script src="{{ asset('js/pagination.js') }}"></script>
+	<script src="{{ asset('js/filters.js') }}"></script>
+	<script src="{{ asset('js/stats.js') }}"></script>
+	<script src="{{ asset('js/main.js') }}"></script>
+{% endblock %}

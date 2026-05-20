@@ -1,0 +1,36 @@
+/* Стили для блока Юрлицо */
+.legal-entity-block {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-left: auto;
+}
+
+.legal-entity-label {
+    font-weight: 600;
+    font-size: 14px;
+    color: #333;
+    margin-bottom: 0;
+    white-space: nowrap;
+}
+
+.legal-entity-select {
+    width: 250px;
+    padding: 8px 12px;
+    border: 1px solid #D4D4D4;
+    border-radius: 4px;
+    font-size: 14px;
+    background-color: white;
+    cursor: pointer;
+    transition: border-color 0.2s;
+}
+
+.legal-entity-select:hover {
+    border-color: #999;
+}
+
+.legal-entity-select:focus {
+    outline: none;
+    border-color: #1B1C1D;
+    box-shadow: 0 0 0 2px rgba(27, 28, 29, 0.1);
+}

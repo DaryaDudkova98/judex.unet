@@ -1,0 +1,90 @@
+/* Темная тема */
+body.dark-theme {
+    background-color: #1a1a1a;
+}
+
+body.dark-theme .main-content {
+    background-color: #2d2d2d;
+}
+
+body.dark-theme .content-header h2 {
+    color: white;
+}
+
+body.dark-theme .dropdown-menu {
+    background-color: #2d2d2d;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+
+body.dark-theme .dropdown-item {
+    color: white;
+}
+
+body.dark-theme .dropdown-item:hover {
+    background-color: #3d3d3d;
+}
+
+body.dark-theme .dropdown-item i {
+    color: #ccc;
+}
+
+body.dark-theme .dropdown-divider {
+    border-top-color: #444;
+}
+
+body.dark-theme .sidebar {
+    background-color: #1a1a1a;
+}
+
+body.dark-theme .sidebar h1 {
+    border-bottom-color: #333;
+}
+
+body.dark-theme .table-container {
+    background-color: #2d2d2d;
+}
+
+body.dark-theme .data-table td {
+    color: white;
+    border-bottom-color: #444;
+}
+
+body.dark-theme .data-table tbody tr:hover {
+    background-color: #3d3d3d;
+}
+
+/* Темная тема для таблиц */
+body.dark-theme .data-table thead tr {
+    background-color: #2d2d2d;
+}
+
+body.dark-theme .data-table th {
+    color: #b0b0b0;
+    border-color: #444;
+}
+
+body.dark-theme .data-table tbody tr:nth-child(odd) {
+    background-color: #2d2d2d;
+}
+
+body.dark-theme .data-table tbody tr:nth-child(even) {
+    background-color: #3d3d3d;
+}
+
+body.dark-theme .data-table td {
+    color: #ffffff;
+    border-color: #444;
+}
+
+body.dark-theme .data-table tbody tr:hover {
+    background-color: #4d4d4d !important;
+}
+
+body.dark-theme .debtor-link {
+    color: #ffffff;
+}
+
+body.dark-theme .debtor-link:hover {
+    color: #409EFF;
+}
+

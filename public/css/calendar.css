@@ -1,0 +1,34 @@
+.calendar-wrapper {
+            padding-right: 20px;
+        }
+        
+        /* Минимум стилей — только позиционирование */
+        .flatpickr-calendar.inline {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        /* Убираем только свои лишние обертки */
+        .result-panel {
+
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #e53935;
+            max-width: 280px;
+        }
+        
+        .btn-primary {
+            background: #e53935;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .btn-primary:hover {
+            background: #c62828;
+        }

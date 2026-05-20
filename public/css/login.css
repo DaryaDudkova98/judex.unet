@@ -1,0 +1,182 @@
+/* F:\judex\public\css\login.css */
+
+/* Общий фон страницы */
+body {
+    background-color: #D4D4D4 !important;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+}
+
+/* Центрирование всего содержимого */
+.center-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    width: 100%;
+}
+
+/* Стили для заголовка Judex.unet.by */
+.center-wrapper > div:first-child {
+    text-align: center;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.center-wrapper > div:first-child h2 {
+    color: #DB2828;
+    margin: 0;
+    padding-top: 0;
+    font-size: 28px;
+}
+
+/* Контейнер формы входа */
+.login-container {
+    max-width: 340px;
+    width: 90%;
+    margin: 0 auto;
+    padding: 15px;
+    border: none;
+    border-radius: 3px;
+    background-color: #ffffff;
+}
+
+/* Группа формы - убираем label */
+.form-group {
+    margin-bottom: 15px;
+    position: relative;
+}
+
+/* Скрываем label */
+label {
+    display: none;
+}
+
+/* Общие стили для полей ввода */
+input[type="text"],
+input[type="password"] {
+    width: 100%;
+    padding: 10px 10px 10px 35px;
+    border: 1px solid #E6E6E7;
+    border-radius: 4px;
+    box-sizing: border-box;
+    background-color: #ffffff;
+    transition: all 0.3s ease;
+}
+
+/* Стили для placeholder */
+input[type="text"]::placeholder,
+input[type="password"]::placeholder {
+    color: #909088;
+}
+
+/* Стили при фокусе на пустом поле */
+input[type="text"]:focus,
+input[type="password"]:focus {
+    outline: none;
+    border-color: #B3D2E7;
+    background-color: #ffffff;
+}
+
+/* Стили когда поле заполнено (не пустое) */
+input[type="text"]:not(:placeholder-shown),
+input[type="password"]:not(:placeholder-shown) {
+    border: 2px solid #ECE7B9;
+    background-color: #fffff0;
+}
+
+/* Стили когда поле в фокусе и заполнено */
+input[type="text"]:focus:not(:placeholder-shown),
+input[type="password"]:focus:not(:placeholder-shown) {
+    border-color: #EAE182;
+    background-color: #fffff0;
+}
+
+/* Стили для автозаполненных полей */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px #fffff0 inset !important;
+    box-shadow: 0 0 0 30px #fffff0 inset !important;
+    border-color: #EAE182 !important;
+    -webkit-text-fill-color: #000000 !important;
+}
+
+/* Для Firefox */
+input:-moz-autofill {
+    background-color: #fffff0 !important;
+    border-color: #EAE182 !important;
+}
+
+/* Для стандартных браузеров */
+input:autofill {
+    background-color: #fffff0 !important;
+    border-color: #EAE182 !important;
+}
+
+/* Дополнительные стили для автозаполнения */
+input:-webkit-autofill:not(:placeholder-shown) {
+    background-color: #fffff0 !important;
+    border-color: #EAE182 !important;
+}
+
+/* Иконки для полей через псевдоэлементы */
+.form-group::before {
+    font-family: "Font Awesome 6 Free";
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #909088;
+    font-size: 16px;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.form-group:first-of-type::before {
+    content: "\f007";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+}
+
+.form-group:last-of-type::before {
+    content: "\f023";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+}
+
+/* Кнопка входа */
+button {
+    width: 100%;
+    padding: 10px;
+    background-color: #DB2828;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 550;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #c02323;
+}
+
+/* Стили для сообщения об ошибке */
+.alert {
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 4px;
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* Корректировка отступов для формы */
+form {
+    margin: 0;
+}

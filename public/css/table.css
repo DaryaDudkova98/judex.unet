@@ -1,0 +1,107 @@
+/* Общие стили для таблиц */
+.table-container {
+    background-color: transparent;
+    overflow-x: auto;
+    border-radius: 8px;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+/* Стили для заголовка таблицы */
+.data-table thead tr {
+    background-color: #ffffff;
+}
+
+.data-table th {
+    padding: 12px 16px;
+    text-align: center !important;
+    font-weight: 600;
+    color: #808080;
+    border: 1px solid #D4D4D4;
+    border-top: none;
+}
+
+/* Первая ячейка заголовка - все границы */
+.data-table th:first-child {
+    border: 1px solid #D4D4D4;
+    text-align: center;
+}
+
+/* Остальные ячейки заголовка - без левой границы */
+.data-table th:not(:first-child) {
+    border-top: 1px solid #D4D4D4;
+    border-right: 1px solid #D4D4D4;
+    border-bottom: 1px solid #D4D4D4;
+    border-left: none;
+}
+
+/* Стили для тела таблицы */
+.data-table tbody tr {
+    transition: background-color 0.3s ease;
+}
+
+/* Нечетные строки */
+.data-table tbody tr:nth-child(odd) {
+    background-color: #ffffff;
+}
+
+/* Четные строки */
+.data-table tbody tr:nth-child(even) {
+    background-color: #ebebeb;
+}
+
+/* Ячейки тела таблицы */
+.data-table td {
+    padding: 12px 16px;
+    color: #000000;
+    border: 1px solid #D4D4D4;
+}
+
+/* Первая ячейка - все границы */
+.data-table td:first-child {
+    border: 1px solid #D4D4D4;
+
+}
+
+/* Остальные ячейки - без левой границы */
+.data-table td:not(:first-child) {
+    border-top: 1px solid #D4D4D4;
+    border-right: 1px solid #D4D4D4;
+    border-bottom: 1px solid #D4D4D4;
+    border-left: none;
+}
+
+/* Ховер эффект для строки */
+.data-table tbody tr:hover {
+    background-color: #c8c8c8 !important;
+}
+
+/* Ссылка на карточку должника */
+.debtor-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #000000;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.debtor-link:hover {
+    color: #409EFF;
+}
+
+.debtor-link:hover .link-icon {
+    opacity: 1;
+}
+
+.link-icon {
+    font-size: 14px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    color: #409EFF;
+}
+

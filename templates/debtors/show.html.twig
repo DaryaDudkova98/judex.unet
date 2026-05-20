@@ -1,0 +1,1595 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Просмотр должника
+{% endblock %}
+
+{% block stylesheets %}
+	{{ parent() }}
+	<link rel="stylesheet" href="{{ asset('css/home.css') }}">
+	<link rel="stylesheet" href="{{ asset('css/table.css') }}">
+	<link rel="stylesheet" href="{{ asset('css/legal-entity.css') }}">
+
+	<style>
+		.content-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 30px;
+		}
+
+		.content-header h2 {
+			margin: 0;
+			font-size: 24px;
+			font-weight: 600;
+		}
+
+		/* Обновленная кнопка назад */
+		.btn-back {
+			display: inline-flex;
+			align-items: center;
+			gap: 8px;
+			padding: 8px 16px;
+			background-color: #808080;
+			border: none;
+			border-radius: 4px;
+			color: white;
+			text-decoration: none;
+			transition: background-color 0.2s;
+		}
+
+		.btn-back:hover {
+			background-color: #666666;
+		}
+
+		.btn-back svg {
+			width: 20px;
+			height: 20px;
+			fill: white;
+		}
+
+		/* Новая кнопка редактирования */
+		.btn-edit-new {
+			display: flex;
+			width: 220px;
+			height: 40px;
+			border: none;
+			border-radius: 4px;
+			cursor: pointer;
+			overflow: hidden;
+			padding: 0;
+			background: none;
+		}
+
+		.btn-edit-icon {
+			width: 40px;
+			background-color: #DB5F06;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			color: white;
+			font-size: 16px;
+		}
+
+		.btn-edit-text {
+			flex: 1;
+			background-color: #EA6200;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			color: white;
+			font-weight: bold;
+			font-size: 14px;
+			text-transform: uppercase;
+			letter-spacing: 0.5px;
+		}
+
+		.btn-edit-new:hover .btn-edit-text {
+			background-color: #c45500;
+		}
+
+		.btn-edit-new:hover .btn-edit-icon {
+			background-color: #c45500;
+		}
+
+		.btn-save {
+			display: inline-flex;
+			align-items: center;
+			gap: 8px;
+			padding: 8px 20px;
+			background-color: #21BA45;
+			border: none;
+			border-radius: 4px;
+			color: white;
+			font-weight: 600;
+			cursor: pointer;
+			transition: background-color 0.2s;
+		}
+
+		.btn-save:hover {
+			background-color: #1a9e3a;
+		}
+
+		.btn-cancel {
+			display: inline-flex;
+			align-items: center;
+			gap: 8px;
+			padding: 8px 20px;
+			background-color: #f5f5f5;
+			border: 1px solid #D4D4D4;
+			border-radius: 4px;
+			color: #333;
+			cursor: pointer;
+			transition: all 0.2s;
+		}
+
+		.btn-cancel:hover {
+			background-color: #e8e8e8;
+		}
+
+		.action-buttons {
+			display: flex;
+			gap: 10px;
+		}
+
+		.debtor-card {
+			background: white;
+			border-radius: 8px;
+			padding: 30px;
+			box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+			display: flex;
+			gap: 40px;
+			margin-bottom: 30px;
+		}
+
+		.debtor-info {
+			flex: 1;
+		}
+
+		.comments-section {
+			width: 320px;
+			flex-shrink: 0;
+		}
+
+		.comments-title {
+			font-weight: bold;
+			font-size: 14px;
+			margin-bottom: 25px;
+			color: #333;
+		}
+
+		.comments-textarea {
+			width: 300px;
+			height: 200px;
+			padding: 12px;
+			border: 1px solid rgba(0, 0, 0, 0.27);
+			border-radius: 4px;
+			font-size: 14px;
+			font-family: inherit;
+			resize: none;
+			overflow-y: auto;
+			box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+			background-color: white;
+		}
+
+		.comments-textarea:focus {
+			outline: none;
+			border-color: #409EFF;
+			box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.1);
+		}
+
+		.comments-textarea:read-only {
+			background-color: #f9f9f9;
+			cursor: default;
+		}
+
+		/* Стили для статистики */
+		.stats-container {
+			background: white;
+			border-radius: 8px;
+			padding: 20px 30px;
+			box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+			margin-bottom: 30px;
+			display: flex;
+			justify-content: space-between;
+			gap: 20px;
+		}
+
+		.stat-card {
+			flex: 1;
+			text-align: center;
+			padding: 15px;
+			border-radius: 8px;
+			background: #f8f9fa;
+			transition: transform 0.2s;
+		}
+
+		.stat-card:hover {
+			transform: translateY(-2px);
+		}
+
+		.stat-label {
+			font-size: 14px;
+			color: #666;
+			margin-bottom: 10px;
+			font-weight: 600;
+		}
+
+		.stat-value {
+			font-size: 28px;
+			font-weight: bold;
+			color: #333;
+		}
+
+		.stat-value.total {
+			color: #FF6B6B;
+		}
+
+		.stat-value.collected {
+			color: #21BA45;
+		}
+
+		.stat-value.remain {
+			color: #409EFF;
+		}
+
+		/* Стили для свитчера */
+		.switch-container {
+			margin-top: 20px;
+			display: flex;
+		}
+
+		.switch-btn {
+			width: 100px;
+			height: 40px;
+			border: 1px solid #D4D4D4;
+			background-color: white;
+			color: black;
+			font-weight: 600;
+			font-size: 14px;
+			text-transform: uppercase;
+			cursor: pointer;
+			transition: all 0.2s;
+		}
+
+		.switch-btn:first-child {
+			border-radius: 4px 0 0 4px;
+			border-right: none;
+		}
+
+		.switch-btn:last-child {
+			border-radius: 0 4px 4px 0;
+			border-left: none;
+		}
+
+		.switch-btn.active {
+			background-color: #409EFF;
+			color: white;
+			border-color: #409EFF;
+		}
+
+		.switch-btn:not(.active):hover {
+			background-color: #f5f5f5;
+			border-color: #409EFF;
+		}
+
+		.info-row {
+			display: flex;
+			margin-bottom: 20px;
+			padding-bottom: 20px;
+			border-bottom: 1px solid #D4D4D4;
+		}
+
+		.info-row:last-child {
+			border-bottom: none;
+			margin-bottom: 0;
+			padding-bottom: 0;
+		}
+
+		.info-label {
+			width: 150px;
+			font-weight: 600;
+			color: #333;
+		}
+
+		.info-value {
+			flex: 1;
+			color: #666;
+		}
+
+		.info-value input,
+		.info-value select {
+			width: 100%;
+			max-width: 400px;
+			padding: 8px 12px;
+			border: 1px solid #D4D4D4;
+			border-radius: 4px;
+			font-size: 14px;
+		}
+
+		.info-value input:focus,
+		.info-value select:focus {
+			outline: none;
+			border-color: #409EFF;
+			box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.1);
+		}
+
+		.info-value input[readonly] {
+			background-color: #f5f5f5;
+			cursor: not-allowed;
+		}
+
+		.mode-view .info-value {
+			padding: 8px 0;
+		}
+
+		.mode-edit .info-value {
+			padding: 0;
+		}
+
+		/* Стили для чекбокса оборудования */
+		.equipment-checkbox-container {
+			margin-top: 20px;
+		}
+
+		.checkbox-label {
+			display: flex;
+			align-items: center;
+			gap: 20px;
+			cursor: pointer;
+			user-select: none;
+		}
+
+		.checkbox-text {
+			font-weight: 600;
+			font-size: 14px;
+			color: #333;
+		}
+
+		/* Кастомный чекбокс */
+		.custom-checkbox {
+			width: 18px;
+			height: 18px;
+			margin: 0;
+			cursor: pointer;
+			appearance: none;
+			-webkit-appearance: none;
+			border: 1px solid #D4D4D4;
+			border-radius: 3px;
+			background-color: white;
+			position: relative;
+			transition: all 0.2s;
+		}
+
+		.custom-checkbox:checked {
+			background-color: #409EFF;
+			border-color: #409EFF;
+		}
+
+		.custom-checkbox:checked::after {
+			content: '';
+			position: absolute;
+			left: 5px;
+			top: 2px;
+			width: 5px;
+			height: 9px;
+			border: solid white;
+			border-width: 0 2px 2px 0;
+			transform: rotate(45deg);
+		}
+
+		.custom-checkbox:hover {
+			border-color: #409EFF;
+		}
+
+		.custom-checkbox:focus {
+			outline: none;
+			box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.1);
+		}
+
+		/* Режим только для чтения (когда чекбокс disabled) */
+		.custom-checkbox:disabled {
+			background-color: #f5f5f5;
+			cursor: not-allowed;
+		}
+
+		.custom-checkbox:disabled:checked {
+			background-color: #a0cfff;
+			border-color: #a0cfff;
+		}
+
+		/* Стили для вкладок */
+		.debtor-tables-section {
+			background: white;
+			border-radius: 8px;
+			padding: 20px;
+			box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+		}
+
+		.tabs-container {
+			display: flex;
+			gap: 0;
+			margin-bottom: 20px;
+			border-bottom: 2px solid #e0e0e0;
+			flex-wrap: wrap;
+		}
+
+		.tab-btn {
+			padding: 12px 24px;
+			background: none;
+			border: none;
+			font-size: 14px;
+			font-weight: 600;
+			color: #666;
+			cursor: pointer;
+			transition: all 0.3s ease;
+			position: relative;
+		}
+
+		.tab-btn:hover {
+			color: #409EFF;
+		}
+
+		.tab-btn.active {
+			color: #409EFF;
+		}
+
+		.tab-btn.active::after {
+			content: '';
+			position: absolute;
+			bottom: -2px;
+			left: 0;
+			right: 0;
+			height: 2px;
+			background-color: #409EFF;
+		}
+
+		.tab-content {
+			display: none;
+		}
+
+		.tab-content.active {
+			display: block;
+		}
+
+		/* Стили для чекбоксов в таблицах */
+		.checkbox-cell {
+			width: 40px;
+			text-align: center;
+		}
+
+		.row-checkbox {
+			width: 18px;
+			height: 18px;
+			cursor: pointer;
+		}
+
+		/* Стили для кнопок управления таблицей */
+		.table-controls {
+			display: flex;
+			gap: 10px;
+			margin-bottom: 15px;
+			justify-content: flex-end;
+			flex-wrap: wrap;
+		}
+
+		.btn-delete-selected {
+			padding: 8px 16px;
+			background-color: #FF6B6B;
+			color: white;
+			border: none;
+			border-radius: 4px;
+			cursor: pointer;
+			font-weight: 600;
+			transition: background-color 0.2s;
+		}
+
+		.btn-delete-selected:hover:not(:disabled) {
+			background-color: #ff5252;
+		}
+
+		.btn-delete-selected:disabled {
+			background-color: #d4d4d4;
+			cursor: not-allowed;
+		}
+
+		.btn-add-row {
+			padding: 8px 16px;
+			background-color: #409EFF;
+			color: white;
+			border: none;
+			border-radius: 4px;
+			cursor: pointer;
+			font-weight: 600;
+			transition: background-color 0.2s;
+		}
+
+		.btn-add-row:hover:not(:disabled) {
+			background-color: #66b1ff;
+		}
+
+		.btn-add-row:disabled {
+			background-color: #d4d4d4;
+			cursor: not-allowed;
+		}
+
+		.btn-attach-file {
+			padding: 8px 16px;
+			background-color: #67C23A;
+			color: white;
+			border: none;
+			border-radius: 4px;
+			cursor: pointer;
+			font-weight: 600;
+			transition: background-color 0.2s;
+		}
+
+		.btn-attach-file:hover:not(:disabled) {
+			background-color: #85ce61;
+		}
+
+		.btn-attach-file:disabled {
+			background-color: #d4d4d4;
+			cursor: not-allowed;
+		}
+
+		/* Стили для файлов */
+		.file-link {
+			display: inline-flex;
+			align-items: center;
+			gap: 5px;
+			color: #409EFF;
+			text-decoration: none;
+			cursor: pointer;
+		}
+
+		.file-link:hover {
+			text-decoration: underline;
+		}
+
+		/* Модальное окно для выбора вкладки */
+		.modal {
+			display: none;
+			position: fixed;
+			z-index: 1000;
+			left: 0;
+			top: 0;
+			width: 100%;
+			height: 100%;
+			background-color: rgba(0,0,0,0.5);
+		}
+
+		.modal-content {
+			background-color: white;
+			margin: 15% auto;
+			padding: 20px;
+			border-radius: 8px;
+			width: 400px;
+			box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+		}
+
+		.modal-header {
+			font-size: 18px;
+			font-weight: 600;
+			margin-bottom: 20px;
+			color: #333;
+		}
+
+		.modal-buttons {
+			display: flex;
+			flex-direction: column;
+			gap: 10px;
+		}
+
+		.modal-btn {
+			padding: 10px;
+			border: none;
+			border-radius: 4px;
+			cursor: pointer;
+			font-size: 14px;
+			font-weight: 600;
+			transition: background-color 0.2s;
+		}
+
+		.modal-btn-claim {
+			background-color: #409EFF;
+			color: white;
+		}
+
+		.modal-btn-claim:hover {
+			background-color: #66b1ff;
+		}
+
+		.modal-close {
+			margin-top: 15px;
+			background-color: #f5f5f5;
+			color: #333;
+		}
+
+		.modal-close:hover {
+			background-color: #e8e8e8;
+		}
+
+		/* Стили для уведомлений */
+		.notification {
+			position: fixed;
+			top: 20px;
+			right: 20px;
+			padding: 12px 20px;
+			border-radius: 4px;
+			color: white;
+			font-weight: 600;
+			z-index: 1000;
+			animation: slideIn 0.3s ease-out;
+		}
+
+		.notification-success {
+			background-color: #21BA45;
+		}
+
+		.notification-error {
+			background-color: #FF6B6B;
+		}
+
+		@keyframes slideIn {
+			from {
+				transform: translateX(100%);
+				opacity: 0;
+			}
+			to {
+				transform: translateX(0);
+				opacity: 1;
+			}
+		}
+
+		/* Статусы */
+		.status-active {
+			color: #21BA45;
+			font-weight: 600;
+		}
+
+		.status-inactive {
+			color: #FF6B6B;
+			font-weight: 600;
+		}
+
+		.status-blocked {
+			color: #FF6B6B;
+			font-weight: 600;
+		}
+	</style>
+{% endblock %}
+
+{% block body %}
+	<div class="app-container">
+		{% include 'layout/header.html.twig' with {'page_title': 'Просмотр должника'} %}
+
+		<div class="grid-container">
+			{% include 'layout/sidebar.html.twig' with {'active_menu': 'debtors'} %}
+
+			<main class="main-content">
+				<div class="content-header">
+					<a href="{{ path('debtors') }}" class="btn-back">
+						<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewbox="0 0 24 24">
+							<path d="M0 0h24v24H0z" fill="none"/>
+							<path fill="currentColor" d="M19 11H7.83l4.88-4.88c.39-.39.39-1.03 0-1.42a.996.996 0 0 0-1.41 0l-6.59 6.59a.996.996 0 0 0 0 1.41l6.59 6.59a.996.996 0 1 0 1.41-1.41L7.83 13H19c.55 0 1-.45 1-1s-.45-1-1-1"/>
+						</svg>
+						Вернуться к списку
+					</a>
+
+					<!-- Новая кнопка редактирования -->
+					<button class="btn-edit-new" id="edit-btn">
+						<div class="btn-edit-icon">
+							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewbox="0 0 16 16">
+								<path d="M0 0h16v16H0z" fill="none"/>
+								<g fill="currentColor">
+									<path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456l-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+									<path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"/>
+								</g>
+							</svg>
+						</div>
+						<div class="btn-edit-text">РЕДАКТИРОВАТЬ</div>
+					</button>
+				</div>
+
+				<div class="debtor-card" id="debtor-card">
+					<div class="debtor-info">
+						<div class="mode-view" id="view-mode">
+							<div class="info-row">
+								<div class="info-label">ФИО:</div>
+								<div class="info-value" id="view-fio">—</div>
+							</div>
+							<div class="info-row">
+								<div class="info-label">Юрлицо:</div>
+								<div class="info-value" id="view-provider">—</div>
+							</div>
+
+							<div class="info-row">
+								<div class="info-label">Логин:</div>
+								<div class="info-value" id="view-login">—</div>
+							</div>
+							<div class="info-row">
+								<div class="info-label">Статус:</div>
+								<div class="info-value" id="view-status">—</div>
+							</div>
+						</div>
+
+						<div class="mode-edit" id="edit-mode" style="display: none;">
+							<div class="info-row">
+								<div class="info-label">ФИО:</div>
+								<div class="info-value">
+									<input type="text" id="edit-fio">
+								</div>
+							</div>
+							<div class="info-row">
+								<div class="info-label">Юрлицо:</div>
+								<div class="info-value">
+									<select id="edit-provider">
+										<option value="ОС">ОС</option>
+										<option value="ХИ">ХИ</option>
+										<option value="Терранэт">Терранэт</option>
+									</select>
+								</div>
+							</div>
+
+							<div class="info-row">
+								<div class="info-label">Логин:</div>
+								<div class="info-value">
+									<input type="text" id="edit-login">
+								</div>
+							</div>
+							<div class="info-row">
+								<div class="info-label">Статус:</div>
+								<div class="info-value">
+									<select id="edit-status">
+										<option value="Активный">Активный</option>
+										<option value="Неактивный">Неактивный</option>
+										<option value="Заблокирован">Заблокирован</option>
+									</select>
+								</div>
+							</div>
+							<div class="info-row">
+								<div class="info-label"></div>
+								<div class="info-value">
+									<div class="action-buttons">
+										<button class="btn-save" id="save-btn">
+											💾 Сохранить
+										</button>
+										<button class="btn-cancel" id="cancel-btn">
+											❌ Отмена
+										</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Блок комментариев -->
+					<div class="comments-section">
+						<div class="comments-title">Комментарии</div>
+						<textarea class="comments-textarea" id="comments-text" placeholder="Введите комментарий..." readonly>Тестовый комментарий к должнику. Здесь может быть длинный текст, который будет переноситься на новую строку и при необходимости появится прокрутка, если текста будет очень много.</textarea>
+
+						<!-- Свитчер -->
+						<div class="switch-container">
+							<button class="switch-btn" id="switch-lte">LTE</button>
+							<button class="switch-btn" id="switch-ethernet">ETHERNET</button>
+						</div>
+
+						<!-- Чекбокс Оборудование -->
+						<div class="equipment-checkbox-container">
+							<label class="checkbox-label">
+								<input type="checkbox" id="equipment-checkbox" class="custom-checkbox">
+								<span class="checkbox-text">Оборудование</span>
+							</label>
+						</div>
+					</div>
+				</div>
+
+				<!-- Блок статистики -->
+				<div class="stats-container">
+					<div class="stat-card">
+						<div class="stat-label">Общий долг</div>
+						<div class="stat-value total" id="total-debt">0 ₽</div>
+					</div>
+					<div class="stat-card">
+						<div class="stat-label">Взыскано</div>
+						<div class="stat-value collected" id="collected-amount">0 ₽</div>
+					</div>
+					<div class="stat-card">
+						<div class="stat-label">Остаток долга</div>
+						<div class="stat-value remain" id="remain-debt">0 ₽</div>
+					</div>
+				</div>
+
+				<!-- Блок таблицы с вкладками -->
+				<div class="debtor-tables-section">
+					<div class="tabs-container">
+						<button class="tab-btn active" data-tab="claim">Претензия</button>
+						<button class="tab-btn" data-tab="state-fee">Госпошлина</button>
+						<button class="tab-btn" data-tab="collected-payments">Взысканные платежи</button>
+						<button class="tab-btn" data-tab="payment-distribution">Распределение платежей</button>
+					</div>
+
+					<!-- Общие кнопки управления -->
+					<div class="table-controls">
+						<button class="btn-attach-file" id="attach-file-btn" disabled>📎 Прикрепить файл</button>
+					</div>
+
+					<!-- Таблица Претензия -->
+					<div class="tab-content active" id="claim-tab">
+						<div class="table-controls">
+							<button class="btn-delete-selected" data-table="claim" disabled>🗑️ Удалить выбранные</button>
+							<button class="btn-add-row" data-table="claim" disabled>+ Добавить запись</button>
+						</div>
+						<div class="table-container">
+							<table class="data-table" id="claim-table">
+								<thead>
+									<tr>
+										<th class="checkbox-cell">
+											<input type="checkbox" class="select-all" data-table="claim">
+										</th>
+										<th>ID</th>
+										<th>Дата претензии</th>
+										<th>Сумма претензии</th>
+										<th>Статус</th>
+										<th>Примечание</th>
+										<th>Прикрепленный файл</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td class="checkbox-cell">
+											<input type="checkbox" class="row-checkbox" data-id="1" data-table="claim">
+										</td>
+										<td>1</td>
+										<td>15.01.2024</td>
+										<td>15 000 ₽</td>
+										<td>Направлена</td>
+										<td>Претензия направлена по почте</td>
+										<td><a href="#" class="file-link" data-file="claim_1.pdf">📄 claim_1.pdf</a></td>
+									</tr>
+									<tr>
+										<td class="checkbox-cell">
+											<input type="checkbox" class="row-checkbox" data-id="2" data-table="claim">
+											</td>
+										<td>2</td>
+										<td>10.02.2024</td>
+										<td>25 000 ₽</td>
+										<td>Рассмотрена</td>
+										<td>Получен ответ от должника</td>
+										<td><a href="#" class="file-link" data-file="claim_2.pdf">📄 claim_2.pdf</a></td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+
+					<!-- Таблица Госпошлина -->
+					<div class="tab-content" id="state-fee-tab">
+						<div class="table-controls">
+							<button class="btn-delete-selected" data-table="state-fee" disabled>🗑️ Удалить выбранные</button>
+							<button class="btn-add-row" data-table="state-fee" disabled>+ Добавить запись</button>
+						</div>
+						<div class="table-container">
+							<table class="data-table" id="state-fee-table">
+								<thead>
+									<tr>
+										<th class="checkbox-cell">
+											<input type="checkbox" class="select-all" data-table="state-fee">
+										</th>
+										<th>ID</th>
+										<th>Дата платежа</th>
+										<th>Сумма госпошлины</th>
+										<th>Номер квитанции</th>
+										<th>Статус оплаты</th>
+										<th>Прикрепленный файл</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td class="checkbox-cell">
+											<input type="checkbox" class="row-checkbox" data-id="1" data-table="state-fee">
+											</td>
+										<td>1</td>
+										<td>20.01.2024</td>
+										<td>3 000 ₽</td>
+										<td>КВ-2024-001</td>
+										<td>Оплачена</td>
+										<td><a href="#" class="file-link" data-file="receipt_1.pdf">📄 receipt_1.pdf</a></td>
+									</tr>
+									<tr>
+										<td class="checkbox-cell">
+											<input type="checkbox" class="row-checkbox" data-id="2" data-table="state-fee">
+											</td>
+										<td>2</td>
+										<td>25.02.2024</td>
+										<td>4 500 ₽</td>
+										<td>КВ-2024-015</td>
+										<td>Ожидает оплаты</td>
+										<td>—</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+
+					<!-- Таблица Взысканные платежи -->
+					<div class="tab-content" id="collected-payments-tab">
+						<div class="table-controls">
+							<button class="btn-delete-selected" data-table="collected-payments" disabled>🗑️ Удалить выбранные</button>
+							<button class="btn-add-row" data-table="collected-payments" disabled>+ Добавить запись</button>
+						</div>
+						<div class="table-container">
+							<table class="data-table" id="collected-payments-table">
+								<thead>
+									<tr>
+										<th class="checkbox-cell">
+											<input type="checkbox" class="select-all" data-table="collected-payments">
+										</th>
+										<th>ID</th>
+										<th>Дата взыскания</th>
+										<th>Сумма взыскания</th>
+										<th>Способ взыскания</th>
+										<th>Исполнительный лист</th>
+										<th>Прикрепленный файл</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td class="checkbox-cell">
+											<input type="checkbox" class="row-checkbox" data-id="1" data-table="collected-payments">
+											</td>
+										<td>1</td>
+										<td>05.03.2024</td>
+										<td>40 000 ₽</td>
+										<td>Судебный приказ</td>
+										<td>ИЛ-2024-001</td>
+										<td><a href="#" class="file-link" data-file="writ_1.pdf">📄 writ_1.pdf</a></td>
+									</tr>
+									<tr>
+										<td class="checkbox-cell">
+											<input type="checkbox" class="row-checkbox" data-id="2" data-table="collected-payments">
+											</td>
+										<td>2</td>
+										<td>10.04.2024</td>
+										<td>18 500 ₽</td>
+										<td>Исполнительное производство</td>
+										<td>ИЛ-2024-089</td>
+										<td>—</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+
+					<!-- Таблица Распределение платежей -->
+					<div class="tab-content" id="payment-distribution-tab">
+						<div class="table-controls">
+							<button class="btn-delete-selected" data-table="payment-distribution" disabled>🗑️ Удалить выбранные</button>
+							<button class="btn-add-row" data-table="payment-distribution" disabled>+ Добавить запись</button>
+						</div>
+						<div class="table-container">
+							<table class="data-table" id="distribution-table">
+								<thead>
+									<tr>
+										<th class="checkbox-cell">
+											<input type="checkbox" class="select-all" data-table="payment-distribution">
+										</th>
+										<th>ID</th>
+										<th>Дата платежа</th>
+										<th>Сумма платежа</th>
+										<th>Распределено на</th>
+										<th>Сумма распределения</th>
+										<th>Прикрепленный файл</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td class="checkbox-cell">
+											<input type="checkbox" class="row-checkbox" data-id="1" data-table="payment-distribution">
+											</td>
+										<td>1</td
+                                            											<td>15.03.2024</td>
+                                            											<td>20 000 ₽</td>
+                                            											<td>Основной долг</td>
+                                            											<td>15 000 ₽</td>
+                                            											<td>—</td>
+                                        		</tr>
+                                        		<tr>
+                                        		<td class="checkbox-cell">
+											<input type="checkbox" class="row-checkbox" data-id="1" data-table="payment-distribution">
+											</td>
+											<td>1</td>
+											<td>15.03.2024</td>
+											<td>20 000 ₽</td>
+											<td>Госпошлина</td>
+											<td>3 000 ₽</td>
+											<td>—</td>
+										</tr>
+										<tr>
+										<td class="checkbox-cell">
+											<input type="checkbox" class="row-checkbox" data-id="1" data-table="payment-distribution">
+											</td>
+											<td>1</td>
+											<td>15.03.2024</td>
+											<td>20 000 ₽</td>
+											<td>Пени</td>
+											<td>2 000 ₽</td>
+											<td>—</td>
+										</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</main>
+		</div>
+	</div>
+
+	<!-- Модальное окно для выбора вкладки при прикреплении файла -->
+	<div id="fileAttachModal" class="modal">
+		<div class="modal-content">
+			<div class="modal-header">Выберите вкладку для прикрепления файла</div>
+			<div class="modal-buttons">
+				<button class="modal-btn modal-btn-claim" data-target="claim">📄 Претензия</button>
+				<button class="modal-btn modal-close">Отмена</button>
+			</div>
+		</div>
+	</div>
+
+	<script>
+	    // Данные должника (в реальном приложении будут загружаться с сервера)
+	    let currentDebtor = {
+	        id: {{ id }},
+	        provider: "ОС",
+	        fio: "Иванов Иван Иванович",
+	        login: "ivanov.i",
+	        status: "Активный",
+	        comments: "Тестовый комментарий к должнику. Здесь может быть длинный текст, который будет переноситься на новую строку и при необходимости появится прокрутка, если текста будет очень много.",
+	        connectionType: "LTE",
+	        hasEquipment: false,
+	        totalDebt: 150000,
+	        collectedAmount: 45000,
+	        remainDebt: 105000
+	    };
+	    
+	    // Функция для обновления статистики
+	    function updateStats() {
+	        document.getElementById('total-debt').textContent = currentDebtor.totalDebt.toLocaleString() + ' ₽';
+	        document.getElementById('collected-amount').textContent = currentDebtor.collectedAmount.toLocaleString() + ' ₽';
+	        document.getElementById('remain-debt').textContent = currentDebtor.remainDebt.toLocaleString() + ' ₽';
+	    }
+	    
+	    // Функция для отображения статуса с классом
+	    function getStatusHtml(status) {
+	        let statusClass = '';
+	        if (status === 'Активный') statusClass = 'status-active';
+	        else if (status === 'Неактивный') statusClass = 'status-inactive';
+	        else if (status === 'Заблокирован') statusClass = 'status-blocked';
+	        
+	        return `<span class="${statusClass}">${status}</span>`;
+	    }
+	    
+	    // Функция обновления активного состояния свитчера
+	    function updateSwitchState(connectionType) {
+	        const lteBtn = document.getElementById('switch-lte');
+	        const ethernetBtn = document.getElementById('switch-ethernet');
+	        
+	        if (connectionType === 'LTE') {
+	            lteBtn.classList.add('active');
+	            ethernetBtn.classList.remove('active');
+	        } else {
+	            ethernetBtn.classList.add('active');
+	            lteBtn.classList.remove('active');
+	        }
+	    }
+	    
+	    // Функция для управления доступом к таблицам (вкл/выкл кнопки)
+	    function setTablesEditMode(enabled) {
+	        // Получаем все кнопки управления таблицами
+	        const deleteButtons = document.querySelectorAll('.btn-delete-selected');
+	        const addButtons = document.querySelectorAll('.btn-add-row');
+	        const attachFileBtn = document.getElementById('attach-file-btn');
+	        
+	        deleteButtons.forEach(btn => {
+	            if (enabled) {
+	                btn.disabled = false;
+	            } else {
+	                btn.disabled = true;
+	                // Сбрасываем выделение при выходе из режима редактирования
+	                const tableName = btn.getAttribute('data-table');
+	                clearAllSelections(tableName);
+	            }
+	        });
+	        
+	        addButtons.forEach(btn => {
+	            btn.disabled = !enabled;
+	        });
+	        
+	        if (attachFileBtn) {
+	            attachFileBtn.disabled = !enabled;
+	        }
+	    }
+	    
+	    // Функция очистки всех выделений в таблице
+	    function clearAllSelections(tableName) {
+	        const checkboxes = document.querySelectorAll(`.row-checkbox[data-table="${tableName}"]`);
+	        const selectAllCheckbox = document.querySelector(`.select-all[data-table="${tableName}"]`);
+	        
+	        checkboxes.forEach(cb => cb.checked = false);
+	        if (selectAllCheckbox) selectAllCheckbox.checked = false;
+	        
+	        // Обновляем состояние кнопки удаления
+	        updateDeleteButtonState(tableName);
+	    }
+	    
+	    // Функция обновления состояния кнопки удаления
+	    function updateDeleteButtonState(tableName) {
+	        const checkboxes = document.querySelectorAll(`.row-checkbox[data-table="${tableName}"]`);
+	        const checkedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
+	        const deleteBtn = document.querySelector(`.btn-delete-selected[data-table="${tableName}"]`);
+	        
+	        if (deleteBtn) {
+	            deleteBtn.disabled = checkedCount === 0;
+	        }
+	    }
+	    
+	    // Функция удаления выбранных записей
+	    function deleteSelectedRows(tableName) {
+	        const checkboxes = document.querySelectorAll(`.row-checkbox[data-table="${tableName}"]:checked`);
+	        const selectedIds = Array.from(checkboxes).map(cb => cb.getAttribute('data-id'));
+	        
+	        if (selectedIds.length === 0) {
+	            showNotification('Не выбрано ни одной записи для удаления', 'error');
+	            return;
+	        }
+	        
+	        if (confirm(`Вы уверены, что хотите удалить ${selectedIds.length} запись(ей)?`)) {
+	            // Здесь будет AJAX запрос на сервер для удаления
+	            console.log(`Удаление записей из таблицы ${tableName} с ID:`, selectedIds);
+	            
+	            // Удаляем строки из таблицы
+	            checkboxes.forEach(cb => {
+	                const row = cb.closest('tr');
+	                row.remove();
+	            });
+	            
+	            // Очищаем выделение
+	            clearAllSelections(tableName);
+	            
+	            showNotification(`Удалено ${selectedIds.length} записей`, 'success');
+	        }
+	    }
+	    
+	    // Функция добавления новой записи
+	    function addNewRow(tableName) {
+	        // Здесь будет открытие модального окна или формы для добавления
+	        console.log(`Добавление новой записи в таблицу ${tableName}`);
+	        showNotification(`Функция добавления записи в таблицу будет реализована`, 'success');
+	    }
+	    
+	    // Функция для переключения вкладок
+	    function initTabs() {
+	        const tabs = document.querySelectorAll('.tab-btn');
+	        const contents = document.querySelectorAll('.tab-content');
+	        
+	        tabs.forEach(tab => {
+	            tab.addEventListener('click', () => {
+	                const tabId = tab.getAttribute('data-tab');
+	                
+	                // Убираем активный класс у всех вкладок и содержимого
+	                tabs.forEach(t => t.classList.remove('active'));
+	                contents.forEach(c => c.classList.remove('active'));
+	                
+	                // Добавляем активный класс текущей вкладке и содержимому
+	                tab.classList.add('active');
+	                document.getElementById(`${tabId}-tab`).classList.add('active');
+	            });
+	        });
+	    }
+	    
+	    // Функция инициализации обработчиков таблиц
+	    function initTableHandlers() {
+	        // Обработчики для чекбоксов "Выбрать все"
+	        document.querySelectorAll('.select-all').forEach(selectAll => {
+	            selectAll.addEventListener('change', function() {
+	                const tableName = this.getAttribute('data-table');
+	                const checkboxes = document.querySelectorAll(`.row-checkbox[data-table="${tableName}"]`);
+	                checkboxes.forEach(cb => cb.checked = this.checked);
+	                updateDeleteButtonState(tableName);
+	            });
+	        });
+	        
+	        // Обработчики для отдельных чекбоксов
+	        document.querySelectorAll('.row-checkbox').forEach(checkbox => {
+	            checkbox.addEventListener('change', function() {
+	                const tableName = this.getAttribute('data-table');
+	                updateDeleteButtonState(tableName);
+	                
+	                // Обновляем состояние "Выбрать все"
+	                const selectAll = document.querySelector(`.select-all[data-table="${tableName}"]`);
+	                const checkboxes = document.querySelectorAll(`.row-checkbox[data-table="${tableName}"]`);
+	                const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+	                if (selectAll) selectAll.checked = allChecked;
+	            });
+	        });
+	        
+	        // Обработчики для кнопок удаления
+	        document.querySelectorAll('.btn-delete-selected').forEach(btn => {
+	            btn.addEventListener('click', function() {
+	                const tableName = this.getAttribute('data-table');
+	                deleteSelectedRows(tableName);
+	            });
+	        });
+	        
+	        // Обработчики для кнопок добавления
+	        document.querySelectorAll('.btn-add-row').forEach(btn => {
+	            btn.addEventListener('click', function() {
+	                const tableName = this.getAttribute('data-table');
+	                addNewRow(tableName);
+	            });
+	        });
+	    }
+	    
+	    // Функция для прикрепления файла
+	    let currentFileInput = null;
+	    
+	    function attachFile(targetTab) {
+	        // Создаем скрытый input для выбора файла
+	        if (currentFileInput) {
+	            currentFileInput.remove();
+	        }
+	        
+	        currentFileInput = document.createElement('input');
+	        currentFileInput.type = 'file';
+	        currentFileInput.style.display = 'none';
+	        currentFileInput.accept = '.pdf,.doc,.docx,.jpg,.png';
+	        
+	        currentFileInput.addEventListener('change', function(e) {
+	            const file = e.target.files[0];
+	            if (file) {
+	                // Здесь будет AJAX запрос на сервер для загрузки файла
+	                console.log(`Загрузка файла "${file.name}" во вкладку "${targetTab}"`);
+	                
+	                // Имитация загрузки
+	                setTimeout(() => {
+	                    // Добавляем файл в текущую активную таблицу
+	                    addFileToTable(targetTab, file.name);
+	                    showNotification(`Файл "${file.name}" успешно прикреплен к "${getTabName(targetTab)}"`, 'success');
+	                }, 500);
+	            }
+	            currentFileInput.remove();
+	            currentFileInput = null;
+	        });
+	        
+	        document.body.appendChild(currentFileInput);
+	        currentFileInput.click();
+	    }
+	    
+	    function getTabName(tabId) {
+	        const tabNames = {
+	            'claim': 'Претензии'
+	        };
+	        return tabNames[tabId] || tabId;
+	    }
+	    
+	    function addFileToTable(tabName, fileName) {
+	        let tableId;
+	        switch(tabName) {
+	            case 'claim':
+	                tableId = 'claim-table';
+	                break;
+	            default:
+	                return;
+	        }
+	        
+	        const table = document.getElementById(tableId);
+	        const tbody = table.querySelector('tbody');
+	        
+	        // Находим первую строку или создаем новую
+	        const firstRow = tbody.querySelector('tr');
+	        
+	        if (firstRow && firstRow.querySelector('.file-link')) {
+	            // Обновляем первую строку
+	            const fileCell = firstRow.querySelector('td:last-child');
+	            if (fileCell && fileCell.innerHTML === '—') {
+	                fileCell.innerHTML = `<a href="#" class="file-link" data-file="${fileName}">📄 ${fileName}</a>`;
+	            } else {
+	                // Добавляем новую строку
+	                addNewFileRow(tbody, fileName);
+	            }
+	        } else {
+	            addNewFileRow(tbody, fileName);
+	        }
+	    }
+	    
+	    function addNewFileRow(tbody, fileName) {
+	        const newRow = tbody.insertRow();
+	        
+	        // Определяем количество колонок
+	        const colCount = tbody.closest('table').querySelector('thead tr').children.length;
+	        
+	        for (let i = 0; i < colCount; i++) {
+	            const cell = newRow.insertCell(i);
+	            if (i === 0) {
+	                cell.className = 'checkbox-cell';
+	                const checkbox = document.createElement('input');
+	                checkbox.type = 'checkbox';
+	                checkbox.className = 'row-checkbox';
+	                checkbox.setAttribute('data-id', Date.now());
+	                checkbox.setAttribute('data-table', tbody.closest('table').id.replace('-table', ''));
+	                cell.appendChild(checkbox);
+	                
+	                // Добавляем обработчик для нового чекбокса
+	                checkbox.addEventListener('change', function() {
+	                    const tableName = this.getAttribute('data-table');
+	                    updateDeleteButtonState(tableName);
+	                    
+	                    const selectAll = document.querySelector(`.select-all[data-table="${tableName}"]`);
+	                    const checkboxes = document.querySelectorAll(`.row-checkbox[data-table="${tableName}"]`);
+	                    const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+	                    if (selectAll) selectAll.checked = allChecked;
+	                });
+	            } else if (i === colCount - 1) {
+	                cell.innerHTML = `<a href="#" class="file-link" data-file="${fileName}">📄 ${fileName}</a>`;
+	            } else {
+	                cell.innerHTML = i === 1 ? Date.now() : (i === 2 ? new Date().toLocaleDateString() : '—');
+	            }
+	        }
+	    }
+	    
+	    // Функция загрузки данных
+	    async function loadDebtorData() {
+	        // Здесь будет AJAX запрос к серверу
+	        // Для примера используем локальные данные
+	        const mockData = {
+	            1: { id: 1, provider: "ОС", fio: "Иванов Иван Иванович", login: "ivanov.i", status: "Активный", comments: "Важный клиент. Требуется особое внимание.", connectionType: "LTE", hasEquipment: true, totalDebt: 150000, collectedAmount: 45000, remainDebt: 105000 },
+	            2: { id: 2, provider: "ХИ", fio: "Петров Петр Петрович", login: "petrov.p", status: "Активный", comments: "Просрочка 30 дней. Направлено уведомление.", connectionType: "ETHERNET", hasEquipment: false, totalDebt: 89000, collectedAmount: 20000, remainDebt: 69000 },
+	            3: { id: 3, provider: "Терранэт", fio: "Сидорова Анна Сергеевна", login: "sidorova.a", status: "Заблокирован", comments: "Долг передан в коллекторское агентство.", connectionType: "LTE", hasEquipment: true, totalDebt: 230000, collectedAmount: 0, remainDebt: 230000 },
+	            4: { id: 4, provider: "ОС", fio: "Козлов Дмитрий Николаевич", login: "kozlov.d", status: "Активный", comments: "", connectionType: "ETHERNET", hasEquipment: false, totalDebt: 45000, collectedAmount: 45000, remainDebt: 0 },
+	            5: { id: 5, provider: "ХИ", fio: "Морозова Елена Петровна", login: "morozova.e", status: "Активный", comments: "Платежи регулярны. Хороший клиент.", connectionType: "LTE", hasEquipment: true, totalDebt: 120000, collectedAmount: 80000, remainDebt: 40000 },
+	            6: { id: 6, provider: "Терранэт", fio: "Волков Александр Сергеевич", login: "volkov.a", status: "Неактивный", comments: "Клиент вышел на связь. Ожидается оплата.", connectionType: "ETHERNET", hasEquipment: false, totalDebt: 67000, collectedAmount: 15000, remainDebt: 52000 }
+	        };
+	        
+	        if (mockData[currentDebtor.id]) {
+	            currentDebtor = {...currentDebtor, ...mockData[currentDebtor.id]};
+	        }
+	        
+	        // Обновляем view mode
+	        document.getElementById('view-provider').textContent = currentDebtor.provider;
+	        document.getElementById('view-fio').textContent = currentDebtor.fio;
+	        document.getElementById('view-login').textContent = currentDebtor.login;
+	        document.getElementById('view-status').innerHTML = getStatusHtml(currentDebtor.status);
+	        document.getElementById('comments-text').value = currentDebtor.comments || '';
+	        updateSwitchState(currentDebtor.connectionType);
+	        
+	        // Обновляем статистику
+	        updateStats();
+	        
+	        // Обновляем состояние чекбокса
+	        const equipmentCheckbox = document.getElementById('equipment-checkbox');
+	        if (equipmentCheckbox) {
+	            equipmentCheckbox.checked = currentDebtor.hasEquipment || false;
+	        }
+	        
+	        // Обновляем edit mode
+	        document.getElementById('edit-id').value = currentDebtor.id;
+	        document.getElementById('edit-provider').value = currentDebtor.provider;
+	        document.getElementById('edit-fio').value = currentDebtor.fio;
+	        document.getElementById('edit-login').value = currentDebtor.login;
+	        document.getElementById('edit-status').value = currentDebtor.status;
+	    }
+	    
+	    // Функция показа уведомления
+	    function showNotification(message, type = 'success') {
+	        const notification = document.createElement('div');
+	        notification.className = `notification notification-${type}`;
+	        notification.textContent = message;
+	        document.body.appendChild(notification);
+	        
+	        setTimeout(() => {
+	            notification.remove();
+	        }, 3000);
+	    }
+	    
+	    // Обработчик изменения свитчера
+	    function handleSwitchChange(type) {
+	        currentDebtor.connectionType = type;
+	        updateSwitchState(type);
+	        console.log('Тип подключения изменен на:', type);
+	    }
+	    
+	    // Переключение режимов
+	    function toggleEditMode() {
+	        const viewMode = document.getElementById('view-mode');
+	        const editMode = document.getElementById('edit-mode');
+	        const commentsTextarea = document.getElementById('comments-text');
+	        const lteBtn = document.getElementById('switch-lte');
+	        const ethernetBtn = document.getElementById('switch-ethernet');
+	        const equipmentCheckbox = document.getElementById('equipment-checkbox');
+	        
+	        if (viewMode.style.display !== 'none') {
+	            // Переключаем в режим редактирования
+	            viewMode.style.display = 'none';
+	            editMode.style.display = 'block';
+	            // Делаем поле комментариев редактируемым
+	            commentsTextarea.readOnly = false;
+	            commentsTextarea.style.backgroundColor = 'white';
+	            // Включаем кнопки свитчера
+	            lteBtn.disabled = false;
+	            ethernetBtn.disabled = false;
+	            // Включаем чекбокс оборудования
+	            if (equipmentCheckbox) {
+	                equipmentCheckbox.disabled = false;
+	            }
+	            // Включаем кнопки управления таблицами
+	            setTablesEditMode(true);
+	        } else {
+	            // Переключаем в режим просмотра
+	            viewMode.style.display = 'block';
+	            editMode.style.display = 'none';
+	            // Делаем поле комментариев только для чтения
+	            commentsTextarea.readOnly = true;
+	            commentsTextarea.style.backgroundColor = '#f9f9f9';
+	            // Отключаем кнопки свитчера в режиме просмотра
+	            lteBtn.disabled = true;
+	            ethernetBtn.disabled = true;
+	            // Отключаем чекбокс оборудования в режиме просмотра
+	            if (equipmentCheckbox) {
+	                equipmentCheckbox.disabled = true;
+	            }
+	            // Отключаем кнопки управления таблицами
+	            setTablesEditMode(false);
+	        }
+	    }
+	    
+	    // Сохранение данных
+	    async function saveDebtor() {
+	        const equipmentCheckbox = document.getElementById('equipment-checkbox');
+	        
+	        const updatedDebtor = {
+	            id: currentDebtor.id,
+	            provider: document.getElementById('edit-provider').value,
+	            fio: document.getElementById('edit-fio').value,
+	            login: document.getElementById('edit-login').value,
+	            status: document.getElementById('edit-status').value,
+	            comments: document.getElementById('comments-text').value,
+	            connectionType: currentDebtor.connectionType,
+	            hasEquipment: equipmentCheckbox ? equipmentCheckbox.checked : false,
+	            totalDebt: currentDebtor.totalDebt,
+	            collectedAmount: currentDebtor.collectedAmount,
+	            remainDebt: currentDebtor.remainDebt
+	        };
+	        
+	        // Здесь будет AJAX запрос на сервер для сохранения
+	        console.log('Сохранение данных:', updatedDebtor);
+	        
+	        // Имитация сохранения
+	        try {
+	            // В реальном приложении здесь будет fetch или axios запрос
+	            // const response = await fetch(`/api/debtors/${currentDebtor.id}`, {
+	            //     method: 'PUT',
+	            //     headers: { 'Content-Type': 'application/json' },
+	            //     body: JSON.stringify(updatedDebtor)
+	            // });
+	            
+	            // if (!response.ok) throw new Error('Ошибка сохранения');
+	            
+	            // Обновляем текущие данные
+	            currentDebtor = updatedDebtor;
+	            
+	            // Обновляем view mode
+	            document.getElementById('view-provider').textContent = currentDebtor.provider;
+	            document.getElementById('view-fio').textContent = currentDebtor.fio;
+	            document.getElementById('view-login').textContent = currentDebtor.login;
+	            document.getElementById('view-status').innerHTML = getStatusHtml(currentDebtor.status);
+	            document.getElementById('comments-text').value = currentDebtor.comments;
+	            updateSwitchState(currentDebtor.connectionType);
+	            
+	            // Обновляем статистику
+	            updateStats();
+	            
+	            // Обновляем состояние чекбокса в режиме просмотра
+	            if (equipmentCheckbox) {
+	                equipmentCheckbox.checked = currentDebtor.hasEquipment;
+	            }
+	            
+	            // Переключаем обратно в режим просмотра
+	            toggleEditMode();
+	            
+	            // Показываем уведомление об успехе
+	            showNotification('Данные успешно сохранены!', 'success');
+	        } catch (error) {
+	            console.error('Ошибка:', error);
+	            showNotification('Ошибка при сохранении данных!', 'error');
+	        }
+	    }
+	    
+	    // Инициализация модального окна
+	    function initModal() {
+	        const modal = document.getElementById('fileAttachModal');
+	        const attachBtn = document.getElementById('attach-file-btn');
+	        const modalBtns = document.querySelectorAll('.modal-btn');
+	        
+	        if (attachBtn) {
+	            attachBtn.addEventListener('click', () => {
+	                modal.style.display = 'block';
+	            });
+	        }
+	        
+	        modalBtns.forEach(btn => {
+	            btn.addEventListener('click', () => {
+	                const target = btn.getAttribute('data-target');
+	                if (target) {
+	                    attachFile(target);
+	                    modal.style.display = 'none';
+	                } else if (btn.classList.contains('modal-close')) {
+	                    modal.style.display = 'none';
+	                }
+	            });
+	        });
+	        
+	        window.addEventListener('click', (event) => {
+	            if (event.target === modal) {
+	                modal.style.display = 'none';
+	            }
+	        });
+	    }
+	    
+	    // Инициализация событий
+	    document.addEventListener('DOMContentLoaded', function() {
+	        // Загружаем данные
+	        loadDebtorData();
+	        
+	        // Инициализируем вкладки
+	        initTabs();
+	        
+	        // Инициализируем обработчики таблиц
+	        initTableHandlers();
+	        
+	        // Инициализируем модальное окно
+	        initModal();
+	        
+	        // Назначаем обработчики
+	        const editBtn = document.getElementById('edit-btn');
+	        const saveBtn = document.getElementById('save-btn');
+	        const cancelBtn = document.getElementById('cancel-btn');
+	        const switchLte = document.getElementById('switch-lte');
+	        const switchEthernet = document.getElementById('switch-ethernet');
+	        
+	        if (editBtn) editBtn.addEventListener('click', toggleEditMode);
+	        if (saveBtn) saveBtn.addEventListener('click', saveDebtor);
+	        if (cancelBtn) cancelBtn.addEventListener('click', toggleEditMode);
+	        
+	        // Обработчики для свитчера
+	        if (switchLte) {
+	            switchLte.addEventListener('click', function() {
+	                handleSwitchChange('LTE');
+	            });
+	        }
+	        
+	        if (switchEthernet) {
+	            switchEthernet.addEventListener('click', function() {
+	                handleSwitchChange('ETHERNET');
+	            });
+	        }
+	        
+	        // Изначально отключаем кнопки свитчера и чекбокс в режиме просмотра
+	        if (switchLte) switchLte.disabled = true;
+	        if (switchEthernet) switchEthernet.disabled = true;
+	        
+	        const equipmentCheckbox = document.getElementById('equipment-checkbox');
+	        if (equipmentCheckbox) equipmentCheckbox.disabled = true;
+	        
+	        // Добавляем обработчик изменения чекбокса (опционально)
+	        if (equipmentCheckbox) {
+	            equipmentCheckbox.addEventListener('change', function() {
+	                currentDebtor.hasEquipment = this.checked;
+	                console.log('Наличие оборудования:', this.checked);
+	            });
+	        }
+	        
+	        // Изначально отключаем кнопки таблиц
+	        setTablesEditMode(false);
+	    });
+	</script>
+{% endblock %}

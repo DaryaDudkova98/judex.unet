@@ -1,0 +1,35 @@
+<!-- Header -->
+<header class="header">
+    <div class="header-left">
+        <button class="burger-menu" id="burgerMenu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        <span class="page-title">{{ page_title|default('Главная') }}</span>
+    </div>
+    
+    <div class="user-info">
+        <span class="user-name">{{ app.user.firstName ?? app.user.email ?? 'User' }} {{ app.user.lastName ?? '' }}</span>
+        <div class="profile-dropdown">
+            <button class="profile-btn" id="profileBtn">
+                <i class="fas fa-user-circle"></i>
+            </button>
+            <div class="dropdown-menu" id="dropdownMenu">
+                <div class="dropdown-item theme-switch">
+                    <i class="fas fa-sun"></i>
+                    <span>Светлая тема</span>
+                </div>
+                <div class="dropdown-item theme-switch">
+                    <i class="fas fa-moon"></i>
+                    <span>Темная тема</span>
+                </div>
+                <hr class="dropdown-divider">
+                <a href="{{ path('app_logout') }}" class="dropdown-item">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Выйти</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</header>
