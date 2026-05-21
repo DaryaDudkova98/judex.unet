@@ -19,15 +19,21 @@ jobs:
           echo "SSH_USER is set: ${{ secrets.SSH_USER != '' }}"
           echo "SSH_PORT is set: ${{ secrets.SSH_PORT != '' }}"
           echo "DEPLOY_PATH is set: ${{ secrets.DEPLOY_PATH != '' }}"
+          echo "SSH_USER value: ${{ secrets.SSH_USER }}"
 
       - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts 2>/dev/null
+          # Добавляем хост без проверки порта для первого подключения
+          ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts 2>/dev/null
 
-      - name: Deploy via rsync
+      - name: Test SSH connection
+        run: |
+          ssh -p ${{ secrets.SSH_PORT }} -v ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "echo 'SSH connection successful'"
+
+      - name: Deploy via rsync with proper permissions
         run: |
           rsync -avz --delete \
             --exclude '.git' \
@@ -37,15 +43,58 @@ jobs:
             --exclude '.env' \
             --exclude '.env.*' \
             --exclude 'tests/' \
+            --exclude '.gitignore' \
+            --chmod=D755,F644 \
             -e "ssh -p ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no" \
-            ./ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.DEPLOY_PATH }}
+            ./ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.DEPLOY_PATH }}/
 
-      - name: Run Symfony commands on Beget
+      - name: Fix permissions and run Symfony commands
         run: |
-          ssh -p ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+          ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
             cd ${{ secrets.DEPLOY_PATH }}
-            composer install --no-dev --optimize-autoloader 2>/dev/null || echo "Composer install skipped"
-            php bin/console doctrine:migrations:migrate --no-interaction 2>/dev/null || echo "Migrations skipped"
-            php bin/console cache:clear --env=prod
-            php bin/console cache:warmup --env=prod
+            
+            # Устанавливаем правильные права для var/cache и var/log
+            mkdir -p var/cache var/log
+            chmod -R 775 var/cache var/log
+            
+            # Устанавливаем владельца для веб-сервера Beget
+            # На Beget веб-сервер обычно работает от пользователя, который совпадает с вашим логином
+            # Или от пользователя 'apache'/'www-data'
+            echo "Current user: $(whoami)"
+            echo "Setting permissions..."
+            
+            # Пробуем разные варианты владельца
+            WEB_USER=$(ps aux | grep -E 'apache|httpd|www-data' | grep -v grep | head -1 | awk '{print $1}')
+            if [ -z "$WEB_USER" ]; then
+                WEB_USER="${{ secrets.SSH_USER }}"
+            fi
+            echo "Web server user: $WEB_USER"
+            
+            # Меняем владельца для var папки
+            sudo chown -R $WEB_USER:${{ secrets.SSH_USER }} var/ 2>/dev/null || \
+            chown -R $WEB_USER:${{ secrets.SSH_USER }} var/ 2>/dev/null || \
+            echo "Cannot change ownership, continuing..."
+            
+            # Composer (если установлен)
+            if [ -f "composer.json" ]; then
+                composer install --no-dev --optimize-autoloader --no-interaction 2>/dev/null || \
+                echo "Composer install skipped or failed"
+            fi
+            
+            # Миграции
+            if [ -f "bin/console" ]; then
+                php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration 2>/dev/null || \
+                echo "Migrations skipped or failed"
+                
+                # Кэш
+                php bin/console cache:clear --env=prod --no-debug
+                php bin/console cache:warmup --env=prod --no-debug
+            fi
+            
+            # Еще раз фикс прав после кэша
+            chmod -R 775 var/cache var/log
           EOF
+
+      - name: Check deployed files
+        run: |
+          ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "ls -la ${{ secrets.DEPLOY_PATH }} | head -20"
