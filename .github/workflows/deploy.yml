@@ -1,4 +1,4 @@
-name: Deploy to Beget
+name: Deploy via FTP to Beget
 
 on:
   push:
@@ -13,38 +13,23 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install sshpass
-        run: sudo apt-get install -y sshpass
-
-      - name: Deploy via rsync with password
-        run: |
-          sshpass -p "${{ secrets.SSH_PASSWORD }}" rsync -avz --delete \
-            --exclude '.git' \
-            --exclude '.github' \
-            --exclude 'var/' \
-            --exclude 'vendor/' \
-            --exclude '.env' \
-            --exclude '.env.*' \
-            --exclude 'tests/' \
-            -e "ssh -p ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no" \
-            ./ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.DEPLOY_PATH }}/
-
-      - name: Run Symfony commands
-        run: |
-          sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -p ${{ secrets.SSH_PORT }} \
-            -o StrictHostKeyChecking=no \
-            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
-            cd ${{ secrets.DEPLOY_PATH }}
-            echo "=== Current directory ==="
-            pwd
-            echo "=== Files ==="
-            ls -la
-            echo "=== Setting permissions ==="
-            chmod -R 775 var/cache var/log 2>/dev/null || true
-            echo "=== Composer ==="
-            composer install --no-dev --optimize-autoloader --no-interaction 2>/dev/null || echo "Composer skipped"
-            echo "=== Cache ==="
-            php bin/console cache:clear --env=prod
-            php bin/console cache:warmup --env=prod
-            echo "=== Done! ==="
-          EOF
+      - name: Deploy via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          port: ${{ secrets.FTP_PORT }}
+          local-dir: ./
+          server-dir: ./judexunet/public_html/
+          protocol: ftp
+          exclude: |
+            .git/
+            .github/
+            var/
+            vendor/
+            .env
+            .env.local
+            tests/
+            *.log
+          dangerous-clean-slate: false
