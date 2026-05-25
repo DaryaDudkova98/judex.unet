@@ -1,0 +1,20 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+
+    # Исключаем phpMyAdmin из редиректов (если он появится)
+    RewriteRule ^phpmyadmin/ - [L,NC]
+    RewriteRule ^pma/ - [L,NC]
+
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteRule .? - [L]
+
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule .? - [L]
+
+    RewriteRule ^(.*)$ index.php [QSA,L]
+</IfModule>
+
+<IfModule !mod_rewrite.c>
+    FallbackResource /index.php
+</IfModule>
