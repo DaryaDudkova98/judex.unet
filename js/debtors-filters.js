@@ -12,7 +12,11 @@ function searchDebtors(searchText, allData) {
 
 // Функция фильтрации по юрлицу для должников
 function filterDebtorsByLegalEntity(selectedValue, allData) {
+    console.log('Filtering with selectedValue:', selectedValue);
+    console.log('All data sample:', allData[0]);
+    
     if (selectedValue === 'all') {
+        console.log('Returning all data');
         return [...allData];
     } else {
         // Получаем short_name по ID из загруженных данных
@@ -21,6 +25,7 @@ function filterDebtorsByLegalEntity(selectedValue, allData) {
         if (window.legalEntityService && window.legalEntityService.legalEntities) {
             const entity = window.legalEntityService.legalEntities.find(e => e.id == selectedValue);
             providerName = entity ? entity.short_name : null;
+            console.log('Found provider from service:', providerName);
         }
         
         // Если сервис еще не загружен или не нашли, используем fallback
@@ -31,8 +36,15 @@ function filterDebtorsByLegalEntity(selectedValue, allData) {
                 '3': 'ТРН'
             };
             providerName = legalMap[selectedValue];
+            console.log('Using fallback provider:', providerName);
         }
         
-        return allData.filter(item => item.provider === providerName);
+        const filtered = allData.filter(item => {
+            console.log(`Comparing item.provider: ${item.provider} with providerName: ${providerName}`);
+            return item.provider === providerName;
+        });
+        
+        console.log(`Filtered count: ${filtered.length}`);
+        return filtered;
     }
 }

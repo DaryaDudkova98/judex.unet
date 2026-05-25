@@ -8,11 +8,12 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    const select = document.getElementById('legal-entity');
+    
     // Загружаем список юрлиц из API
     fetch('/api/legal-entities')
         .then(response => response.json())
         .then(data => {
-            const select = document.getElementById('legal-entity');
             if (select) {
                 // Очищаем текущие опции
                 select.innerHTML = '';
@@ -21,14 +22,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 data.forEach(entity => {
                     const option = document.createElement('option');
                     option.value = entity.id;
-                    
-                    // Для опции "all" показываем "Все Юрлица"
-                    if (entity.id === 'all') {
-                        option.textContent = entity.short_name;
-                    } else {
-                        option.textContent = entity.short_name;
-                    }
-                    
+                    option.textContent = entity.id === 'all' ? entity.short_name : entity.short_name;
                     select.appendChild(option);
                 });
                 
@@ -37,12 +31,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (savedValue && [...select.options].some(opt => opt.value === savedValue)) {
                     select.value = savedValue;
                 }
+                
+                // Триггерим событие change для обновления таблицы
+                select.dispatchEvent(new Event('change'));
             }
         })
         .catch(error => {
             console.error('Ошибка загрузки юрлиц:', error);
             // Запасной вариант - статические данные
-            const select = document.getElementById('legal-entity');
             if (select) {
                 select.innerHTML = `
                     <option value="all">Все Юрлица</option>
@@ -50,7 +46,20 @@ document.addEventListener('DOMContentLoaded', function() {
                     <option value="2">ХИ</option>
                     <option value="3">ТРН</option>
                 `;
+                select.dispatchEvent(new Event('change'));
             }
         });
+    
+    // Сохраняем выбранное значение при изменении
+    if (select) {
+        select.addEventListener('change', function() {
+            localStorage.setItem('selectedLegalEntity', this.value);
+            
+            // Обновляем таблицу если есть функция refresh
+            if (typeof refreshDebtorsTable === 'function') {
+                refreshDebtorsTable();
+            }
+        });
+    }
 });
 </script>
