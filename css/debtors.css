@@ -1,0 +1,72 @@
+/* debtors.css - стили для страницы списка должников */
+
+.filters-container {
+    margin-bottom: 50px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.status-active {
+    color: #21BA45;
+    font-weight: 600;
+}
+
+.status-inactive {
+    color: #FF6B6B;
+    font-weight: 600;
+}
+
+/* Стили для ссылок в таблице */
+.debtor-link {
+    color: #333;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: color 0.2s;
+}
+
+.debtor-link:hover {
+    color: #409EFF;
+}
+
+.debtor-link:hover .link-icon {
+    opacity: 1;
+}
+
+.link-icon {
+    opacity: 0.5;
+    font-size: 14px;
+    transition: opacity 0.2s;
+}
+
+.external-link {
+    color: #333;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: color 0.2s;
+}
+
+.external-link:hover {
+    color: #409EFF;
+    text-decoration: underline;
+}
+
+.external-link:hover .external-icon {
+    opacity: 1;
+}
+
+.external-icon {
+    opacity: 0.5;
+    font-size: 12px;
+    transition: opacity 0.2s;
+}

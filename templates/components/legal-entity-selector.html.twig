@@ -1,10 +1,56 @@
 <!-- Компонент выбора юрлица -->
-<div class="legal-entity-block">
-    <label for="legal-entity" class="legal-entity-label">Юрлицо</label>
-    <select id="legal-entity" class="legal-entity-select">
-        <option value="all">Все Юрлица</option>
-        <option value="os">ОС</option>
-        <option value="hi">ХИ</option>
-        <option value="terranet">Терранэт</option>
+<div class="legal-entity-block {% if wrapper_class is defined %}{{ wrapper_class }}{% endif %}">
+    <label for="legal-entity" class="legal-entity-label {% if label_class is defined %}{{ label_class }}{% endif %}">Юрлицо</label>
+    <select id="legal-entity" class="legal-entity-select {% if select_class is defined %}{{ select_class }}{% endif %}">
+        <option value="all">Загрузка...</option>
     </select>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Загружаем список юрлиц из API
+    fetch('/api/legal-entities')
+        .then(response => response.json())
+        .then(data => {
+            const select = document.getElementById('legal-entity');
+            if (select) {
+                // Очищаем текущие опции
+                select.innerHTML = '';
+                
+                // Добавляем опции из API
+                data.forEach(entity => {
+                    const option = document.createElement('option');
+                    option.value = entity.id;
+                    
+                    // Для опции "all" показываем "Все Юрлица"
+                    if (entity.id === 'all') {
+                        option.textContent = entity.short_name;
+                    } else {
+                        option.textContent = entity.short_name;
+                    }
+                    
+                    select.appendChild(option);
+                });
+                
+                // Восстанавливаем сохраненное значение
+                const savedValue = localStorage.getItem('selectedLegalEntity');
+                if (savedValue && [...select.options].some(opt => opt.value === savedValue)) {
+                    select.value = savedValue;
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Ошибка загрузки юрлиц:', error);
+            // Запасной вариант - статические данные
+            const select = document.getElementById('legal-entity');
+            if (select) {
+                select.innerHTML = `
+                    <option value="all">Все Юрлица</option>
+                    <option value="1">ОС</option>
+                    <option value="2">ХИ</option>
+                    <option value="3">ТРН</option>
+                `;
+            }
+        });
+});
+</script>
